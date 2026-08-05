@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="A pure-Go, CGO_ENABLED=0 headless web engine — fetch a URL, parse HTML into a DOM, apply a real CSS cascade, lay out block-and-inline flow, and paint anti-aliased text, backgrounds and images to an image. No Chromium, no cgo.">
+        <meta name="description" content="A pure-Go, CGO_ENABLED=0 headless web engine — fetch a URL, parse HTML into a DOM, apply a real CSS cascade, run the page's JavaScript, lay out a full box model (flex/grid/tables/position), and paint anti-aliased text, gradients, images and SVG to an image. No Chromium, no cgo.">
       
       
       
@@ -532,23 +532,27 @@ Each stage is an owned package with a narrow contract, so the pure-logic stages
 </tr>
 <tr>
 <td><code>css</code></td>
-<td>A minimal-but-real CSS subset: value model, stylesheet/declaration parser, tag/class/id selectors with specificity, a UA default stylesheet, and cascade + inheritance. Its own small tokenizer/parser, for full control and 100%-coverable pure logic.</td>
+<td>A real CSS subset: value model, stylesheet/declaration parser, tag/class/id + descendant/child/sibling combinators + <code>:checked</code>/<code>:not()</code> selectors with specificity, <code>var()</code> custom properties, <code>@media</code> width queries, modern colour, dark-mode, a UA default stylesheet, and cascade + inheritance. Its own small tokenizer/parser, for full control and coverable pure logic.</td>
 </tr>
 <tr>
 <td><code>layout</code></td>
-<td>Block-and-inline flow with a greedy word-wrap line-breaker and <code>white-space: pre</code>, driven through a <code>Measurer</code> interface so geometry is unit-testable <strong>without fonts</strong>.</td>
+<td>The full box model — block-and-inline flow, floats + clear, flexbox, CSS grid, tables, <code>position</code> (relative/absolute/fixed/sticky), margin collapsing, a greedy word-wrap line-breaker — driven through a <code>Measurer</code> interface so geometry is unit-testable <strong>without fonts</strong>.</td>
+</tr>
+<tr>
+<td><code>js</code></td>
+<td>JavaScript execution via <a href="https://github.com/dop251/goja">goja</a> bound to a minimal real DOM, with <code>fetch()</code>/XHR and read-back of real laid-out geometry (<code>getBoundingClientRect</code>, <code>offset*</code>, <code>getComputedStyle</code>).</td>
 </tr>
 <tr>
 <td><code>paint</code></td>
-<td>Rasterises the box tree to <code>*image.RGBA</code>; also provides the real <code>Measurer</code> backed by go-opentype faces.</td>
+<td>Rasterises the box tree to <code>*image.RGBA</code> — AA text (real bold + italic), gradients, border-radius, box-shadow, opacity, images and SVG; also provides the real <code>Measurer</code> backed by go-opentype faces.</td>
 </tr>
 <tr>
 <td><code>engine</code> (root)</td>
-<td>The public API — <code>Fetch</code>, <code>Render</code>, <code>Screenshot</code>, <code>RenderInfo</code> — plus image sub-resource loading.</td>
+<td>The public API — <code>Fetch</code>, <code>Render</code>, <code>Screenshot</code>, <code>RenderHTML</code>, <code>RenderWithLinks</code>, <code>RenderInfo</code> — the settle-then-render loop, image + SVG sub-resource loading, and the anchor click hit-map.</td>
 </tr>
 <tr>
 <td><code>cmd/render</code></td>
-<td>A single-binary CLI: <code>render -url URL -out shot.png -w 1024 -h 768</code>.</td>
+<td>A single-binary CLI: <code>render -url URL -out shot.png -w 1024 -h 768</code> (or <code>-file page.html</code>).</td>
 </tr>
 </tbody>
 </table>
@@ -580,7 +584,7 @@ whole engine builds with <code>CGO_ENABLED=0</code> and carries no copyleft.</p>
 </tr>
 <tr>
 <td><a href="https://github.com/go-opentype/opentype"><code>go-opentype/opentype</code></a> + <a href="https://github.com/go-opentype/fonts"><code>fonts</code></a></td>
-<td>Advance-width measurement and 8-bit AA glyph masks; embedded OFL sans/serif/mono faces.</td>
+<td>Advance-width measurement and 8-bit AA glyph masks; embedded OFL sans/serif/mono faces with real bold + italic.</td>
 </tr>
 <tr>
 <td><a href="https://github.com/go-widgets/painter"><code>go-widgets/painter</code></a></td>
@@ -590,10 +594,19 @@ whole engine builds with <code>CGO_ENABLED=0</code> and carries no copyleft.</p>
 <td><a href="https://github.com/go-images/images"><code>go-images/images</code></a></td>
 <td>PNG/JPEG decode + resize for <code>&lt;img&gt;</code>.</td>
 </tr>
+<tr>
+<td><a href="https://github.com/dop251/goja"><code>dop251/goja</code></a></td>
+<td>Pure-Go ES5.1 + most-ES2015 JavaScript engine, bound to the DOM by the <code>js</code> package.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/srwiley/oksvg"><code>srwiley/oksvg</code></a> + <a href="https://github.com/srwiley/rasterx"><code>rasterx</code></a></td>
+<td>Pure-Go SVG parse + rasterisation.</td>
+</tr>
 </tbody>
 </table>
-<p><strong>Built clean-room</strong> — the DOM wrapper, the CSS cascade + inheritance, the
-block/inline flow layout engine, and the paint orchestration + public API.</p>
+<p><strong>Built clean-room</strong> — the DOM wrapper, the CSS cascade + inheritance + selector
+engine, the full box-model layout engine, the DOM binding for JS, and the paint
+orchestration + public API.</p>
 <h2 id="why-not-build-on-a-prior-pure-go-browser">Why not build on a prior pure-Go browser?<a class="headerlink" href="#why-not-build-on-a-prior-pure-go-browser" title="Permanent link">&para;</a></h2>
 <p>The prior pure-Go browser engine <code>opossum</code> (renamed to
 <a href="https://github.com/psilva261/mycel"><code>mycel</code></a>) was studied in depth. Its choice

@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="A pure-Go, CGO_ENABLED=0 headless web engine — fetch a URL, parse HTML into a DOM, apply a real CSS cascade, lay out block-and-inline flow, and paint anti-aliased text, backgrounds and images to an image. No Chromium, no cgo.">
+        <meta name="description" content="A pure-Go, CGO_ENABLED=0 headless web engine — fetch a URL, parse HTML into a DOM, apply a real CSS cascade, run the page's JavaScript, lay out a full box model (flex/grid/tables/position), and paint anti-aliased text, gradients, images and SVG to an image. No Chromium, no cgo.">
       
       
       
@@ -355,36 +355,18 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#phase-0-static-renderer-shipping" class="md-nav__link">
+  <a href="#shipped" class="md-nav__link">
     <span class="md-ellipsis">
-      Phase 0 — Static renderer · shipping
+      Shipped
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#phase-1-scripting-planned" class="md-nav__link">
+  <a href="#remaining-levers-honest-not-promised" class="md-nav__link">
     <span class="md-ellipsis">
-      Phase 1 — Scripting · planned
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#phase-2-real-box-model-planned" class="md-nav__link">
-    <span class="md-ellipsis">
-      Phase 2 — Real box model · planned
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#phase-3-browserproxy-planned" class="md-nav__link">
-    <span class="md-ellipsis">
-      Phase 3 — browserproxy · planned
+      Remaining levers (honest, not promised)
     </span>
   </a>
   
@@ -454,36 +436,18 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#phase-0-static-renderer-shipping" class="md-nav__link">
+  <a href="#shipped" class="md-nav__link">
     <span class="md-ellipsis">
-      Phase 0 — Static renderer · shipping
+      Shipped
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#phase-1-scripting-planned" class="md-nav__link">
+  <a href="#remaining-levers-honest-not-promised" class="md-nav__link">
     <span class="md-ellipsis">
-      Phase 1 — Scripting · planned
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#phase-2-real-box-model-planned" class="md-nav__link">
-    <span class="md-ellipsis">
-      Phase 2 — Real box model · planned
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#phase-3-browserproxy-planned" class="md-nav__link">
-    <span class="md-ellipsis">
-      Phase 3 — browserproxy · planned
+      Remaining levers (honest, not promised)
     </span>
   </a>
   
@@ -514,40 +478,95 @@
 
 
 <h1 id="roadmap">Roadmap<a class="headerlink" href="#roadmap" title="Permanent link">&para;</a></h1>
-<p>The engine grows in phases. Only <strong>Phase 0 ships today</strong>; the rest is the
-intended direction, stated honestly rather than promised.</p>
-<h2 id="phase-0-static-renderer-shipping">Phase 0 — Static renderer · shipping<a class="headerlink" href="#phase-0-static-renderer-shipping" title="Permanent link">&para;</a></h2>
-<p>A static (no-JavaScript) renderer end to end:</p>
+<p>The engine grew in phases. <strong>Phases 0 through 2.4 have shipped</strong>, and the
+<a href="https://github.com/go-webengine/browserproxy"><code>browserproxy</code></a> remote-browser
+service that was the original Phase-3 goal is <strong>live</strong>. What remains is a set of
+honest levers, not a promise of a full browser. Measured fidelity is on the
+<a href="../fidelity/">Fidelity</a> page; the phase-by-phase log with before/after numbers is
+in the engine's
+<a href="https://github.com/go-webengine/engine/blob/main/FIDELITY.md"><code>FIDELITY.md</code></a> and
+<a href="https://github.com/go-webengine/engine/blob/main/bench/REPORT.md"><code>bench/REPORT.md</code></a>.</p>
+<h2 id="shipped">Shipped<a class="headerlink" href="#shipped" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>What landed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>0 — Static renderer</strong></td>
+<td>HTML → owned DOM → real CSS cascade (specificity + inheritance) → block/inline flow → AA text/background/image paint → PNG.</td>
+</tr>
+<tr>
+<td><strong>1 — Real box model</strong></td>
+<td>Floats + clear, flexbox, tables, painted borders, margin collapsing, <code>@media</code> width queries.</td>
+</tr>
+<tr>
+<td><strong>1.5 — CSS breadth I</strong></td>
+<td>External <code>&lt;link&gt;</code> stylesheet fetch, <code>var()</code> custom properties, anchor <strong>click hit-map</strong> (<code>Links</code>).</td>
+</tr>
+<tr>
+<td><strong>1.7 — Flex + grid</strong></td>
+<td>Complete flexbox and <strong>CSS grid</strong>.</td>
+</tr>
+<tr>
+<td><strong>1.8 — Positioning</strong></td>
+<td><code>position: relative / absolute / fixed / sticky</code>.</td>
+</tr>
+<tr>
+<td><strong>1.9 — CSS breadth II</strong></td>
+<td>Modern colour (<code>rgb()</code>/<code>hsl()</code>), Tailwind variants, <strong>border-radius</strong>, dark-mode groundwork.</td>
+</tr>
+<tr>
+<td><strong>2.0 — Decorations</strong></td>
+<td><strong>Linear/radial gradients</strong>, <code>background-image: url()</code>, <strong>box-shadow</strong>, group <strong>opacity</strong>.</td>
+</tr>
+<tr>
+<td><strong>2 — JavaScript</strong></td>
+<td><a href="https://github.com/dop251/goja">goja</a> bound to a real DOM with <code>fetch()</code>/XHR.</td>
+</tr>
+<tr>
+<td><strong>2.1 — SVG</strong></td>
+<td>Pure-Go SVG rasterisation (oksvg + rasterx) for <code>&lt;img *.svg&gt;</code>, <code>data:</code> and inline <code>&lt;svg&gt;</code>.</td>
+</tr>
+<tr>
+<td><strong>2.2 — Dynamic render</strong></td>
+<td>Layout↔JS metric read-back (<code>getBoundingClientRect</code>, <code>offset*</code>, <code>getComputedStyle</code>) + a <strong>settle-then-render</strong> bounded-fixpoint loop; runtime-injected <code>&lt;script&gt;</code>/<code>&lt;style&gt;</code>/<code>&lt;link&gt;</code>.</td>
+</tr>
+<tr>
+<td><strong>2.3 — Selector hack</strong></td>
+<td>Sibling combinators <code>~</code>/<code>+</code>, <strong><code>:checked</code></strong>, <strong><code>:not()</code></strong> — the checkbox-hack that collapses MediaWiki dropdowns; "reduce, don't drop" for unmodelled selectors.</td>
+</tr>
+<tr>
+<td><strong>2.4 — JS on hit-map</strong></td>
+<td>The <code>RenderWithLinks</code> path shares the JS-settled pipeline, so JS-built links land in the click hit-map.</td>
+</tr>
+<tr>
+<td><strong>Remote browser</strong></td>
+<td><a href="https://github.com/go-webengine/browserproxy"><code>browserproxy</code></a>: a WebSocket service that renders server-side with the engine, streams frames + hit-map, forwards clicks/scrolls/keys, and guards against SSRF. <strong>Shipping.</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Real bold + italic faces replaced the earlier faux-bold synthesis along the way.</p>
+<h2 id="remaining-levers-honest-not-promised">Remaining levers (honest, not promised)<a class="headerlink" href="#remaining-levers-honest-not-promised" title="Permanent link">&para;</a></h2>
 <ul>
-<li>HTML parse → owned DOM.</li>
-<li>A real CSS cascade: UA default stylesheet, <code>&lt;style&gt;</code> and inline <code>style=</code>,
-  tag/class/id selectors with specificity (inline &gt; id &gt; class &gt; tag), and
-  inheritance.</li>
-<li>Block-and-inline flow layout with a greedy word-wrap line-breaker and
-  <code>white-space: pre</code>.</li>
-<li>Anti-aliased text (go-opentype) at the cascaded size, backgrounds, and
-  best-effort <code>&lt;img&gt;</code> (http(s) + <code>data:</code>, PNG/JPEG), painted to an
-  <code>image.RGBA</code> → PNG.</li>
+<li><strong>Fidelity residuals</strong> — <code>&lt;li&gt;</code> <code>list-style</code> marker discs; icon-font /
+  <code>visually-hidden</code> chrome that renders as text; <code>conic-gradient</code>, CSS <code>filter</code>
+  and <code>mask</code>; SVG <code>&lt;filter&gt;</code>/<code>&lt;mask&gt;</code>/<code>&lt;pattern&gt;</code>/<code>&lt;text&gt;</code>/embedded <code>&lt;image&gt;</code>.</li>
+<li><strong>Performance</strong> — large computed pages (pkg.go.dev, go.dev) render slower than
+  Chrome; that is the next big lever, and it is a speed gap, not a fidelity one.</li>
+<li><strong>Interaction depth in JS</strong> — more of the CSSOM and event model, so highly
+  interactive SPAs settle closer to their browser state.</li>
 </ul>
-<p>See <a href="../fidelity/">Fidelity</a> for exactly what renders correctly and what does not.</p>
-<h2 id="phase-1-scripting-planned">Phase 1 — Scripting · planned<a class="headerlink" href="#phase-1-scripting-planned" title="Permanent link">&para;</a></h2>
-<p>Wire a pure-Go JavaScript engine (<a href="https://github.com/dop251/goja">goja</a> — no
-cgo, ES5.1 + most ES2015) to the DOM so script-rendered content populates.
-Deferred deliberately: Phase 0 has no JS dependency at all.</p>
-<h2 id="phase-2-real-box-model-planned">Phase 2 — Real box model · planned<a class="headerlink" href="#phase-2-real-box-model-planned" title="Permanent link">&para;</a></h2>
-<p><code>float</code> / <code>flex</code> / <code>grid</code> / table layout and absolute/fixed positioning, so
-modern page chrome (sidebars, nav bars, infoboxes) no longer linearises to a
-single column. Selector combinators, <code>max-width</code>/<code>min-width</code>, <code>line-height</code>,
-<code>border</code> and more CSS follow here. The clean CSS-selector upgrade path
-(cascadia / tdewolff) is already scoped in the survey.</p>
-<h2 id="phase-3-browserproxy-planned">Phase 3 — browserproxy · planned<a class="headerlink" href="#phase-3-browserproxy-planned" title="Permanent link">&para;</a></h2>
-<p>Render server-side and stream frames to the
-<a href="https://github.com/wasmdesk">wasmdesk</a> <code>clients/browser</code> front-end — the
-original motivation for a headless, cgo-free engine that runs anywhere Go runs.</p>
+<p>These are diminishing-returns work: the mean windowed-SSIM across the five bench
+pages is already ≈ 0.69, and <code>example.com</code> is at near-parity (0.954).</p>
 <h2 id="non-goals-for-now">Non-goals (for now)<a class="headerlink" href="#non-goals-for-now" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Being a full standards-compliant browser. This is a <em>renderer</em> with an honest,
-  growing feature set, not a Chromium replacement.</li>
+  growing feature set — <strong>not</strong> a Chromium replacement, and not claimed to match
+  Chromium pixel-for-pixel.</li>
 <li>cgo, a bundled browser binary, or a host web view — ever. Pure Go is the whole
   point.</li>
 </ul>

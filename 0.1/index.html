@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="A pure-Go, CGO_ENABLED=0 headless web engine — fetch a URL, parse HTML into a DOM, apply a real CSS cascade, lay out block-and-inline flow, and paint anti-aliased text, backgrounds and images to an image. No Chromium, no cgo.">
+        <meta name="description" content="A pure-Go, CGO_ENABLED=0 headless web engine — fetch a URL, parse HTML into a DOM, apply a real CSS cascade, run the page's JavaScript, lay out a full box model (flex/grid/tables/position), and paint anti-aliased text, gradients, images and SVG to an image. No Chromium, no cgo.">
       
       
       
@@ -313,6 +313,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#what-it-renders-today" class="md-nav__link">
+    <span class="md-ellipsis">
+      What it renders today
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#pipeline" class="md-nav__link">
     <span class="md-ellipsis">
       Pipeline
@@ -443,6 +452,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#what-it-renders-today" class="md-nav__link">
+    <span class="md-ellipsis">
+      What it renders today
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#pipeline" class="md-nav__link">
     <span class="md-ellipsis">
       Pipeline
@@ -495,17 +513,37 @@
 
 <h1 id="go-webengine">go-webengine<a class="headerlink" href="#go-webengine" title="Permanent link">&para;</a></h1>
 <p>A pure-Go, <strong><code>CGO_ENABLED=0</code></strong> headless web engine. Give it a URL, get back an
-<strong>image of the page</strong> — HTML/CSS layout and paint with <strong>no Chromium, no cgo and
-no host web view</strong>.</p>
-<p>It is the rendering core of the <a href="https://github.com/wasmdesk">wasmdesk</a>
-<strong>browserproxy</strong> roadmap: a service that renders pages server-side and streams
-frames to a thin front-end. Phase 0 — shipping today — is a <em>static</em> renderer
-(no JavaScript).</p>
+<strong>image of the page</strong> — HTML/CSS layout and paint, with <strong>JavaScript executed</strong>
+against a real DOM, and <strong>no Chromium, no cgo and no host web view</strong>.</p>
+<p>It is the rendering core of the
+<a href="https://github.com/go-webengine/browserproxy"><code>browserproxy</code></a> remote-browser
+service and the <a href="https://github.com/wasmdesk">wasmdesk</a> in-desktop browser: a
+server renders pages and streams frames (plus a click hit-map) to a thin client.</p>
+<h2 id="what-it-renders-today">What it renders today<a class="headerlink" href="#what-it-renders-today" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Full box-model layout</strong>: block, inline, floats + clear, <strong>flexbox</strong>, <strong>CSS
+  grid</strong>, <strong>tables</strong>, <strong><code>position</code></strong> (relative/absolute/fixed/sticky), margin
+  collapsing, word-wrap.</li>
+<li><strong>Broad CSS</strong>: cascade + specificity + inheritance, <code>var()</code> custom properties,
+  <code>@media</code> width queries, <strong>dark-mode</strong>, external <code>&lt;link&gt;</code> stylesheets, modern
+  <code>rgb()</code>/<code>hsl()</code>, <strong>linear/radial gradients</strong>, <code>background-image</code>, border +
+  <strong>border-radius</strong>, <strong>box-shadow</strong>, opacity; sibling combinators, <code>:checked</code>,
+  <code>:not()</code>.</li>
+<li><strong>Text</strong>: anti-aliased serif/sans/mono with <strong>real bold and italic</strong> faces.</li>
+<li><strong>Images</strong>: PNG/JPEG, <code>data:</code>, and <strong>SVG</strong> (<code>&lt;img&gt;</code>, <code>data:</code> and inline <code>&lt;svg&gt;</code>).</li>
+<li><strong>JavaScript</strong>: page scripts run via <a href="https://github.com/dop251/goja">goja</a>
+  against a real DOM with <code>fetch()</code>/XHR and laid-out-geometry read-back; a
+  settle-then-render loop reflects script-driven DOM mutations in the output.</li>
+</ul>
+<p>See <strong><a href="fidelity/">Fidelity</a></strong> for the honest, measured account of what matches a
+browser and what does not.</p>
 <h2 id="pipeline">Pipeline<a class="headerlink" href="#pipeline" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Fetch (go-browserhttp)  →  Parse (x/net/html → dom)  →  Cascade (css)
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>     →  Layout: block + inline flow, word-wrap (layout)
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>     →  Paint: AA text (go-opentype) + backgrounds (go-widgets/painter) + images (go-images)
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>     →  image.RGBA  →  PNG
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Fetch (go-browserhttp)  →  Parse (x/net/html → dom)  →  Cascade (css: +var()/@media/dark-mode)
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>     →  JavaScript (js: goja + real DOM + fetch/XHR)
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>     →  Layout: block · inline · float · flex · grid · table · position (layout)
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>     ⟲   settle loop: JS reads laid-out metrics → re-cascade + re-layout to a bounded fixpoint
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>     →  Paint: AA text/SVG/gradients/shadows + backgrounds (go-widgets/painter) + images (go-images)
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>     →  image.RGBA  →  PNG (+ optional link hit-map)
 </code></pre></div>
 <h2 id="quickstart">Quickstart<a class="headerlink" href="#quickstart" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">import</span><span class="w"> </span><span class="p">(</span>
@@ -527,8 +565,10 @@ frames to a thin front-end. Phase 0 — shipping today — is a <em>static</em> 
 <a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="nx">_</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nx">os</span><span class="p">.</span><span class="nx">WriteFile</span><span class="p">(</span><span class="s">&quot;out.png&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">png</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="nx">o644</span><span class="p">)</span>
 </code></pre></div>
 <p><code>engine.Render</code> returns the raw <code>*image.RGBA</code> plus a <code>RenderInfo</code> (<code>Title</code>,
-<code>URL</code>, <code>ContentHeight</code>). The viewport width is fixed; the height grows to fit the
-whole page. A <code>render</code> CLI is bundled:</p>
+<code>URL</code>, <code>ContentHeight</code>). For more control, <code>engine.New()</code> gives an <code>*Engine</code> with
+<code>RenderHTML</code> (offline), <code>RenderWithLinks</code> (image + click hit-map) and a
+<code>DisableJS</code> field. The viewport width is fixed; the height grows to fit the whole
+page. A <code>render</code> CLI is bundled:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>go run github.com/go-webengine/engine/cmd/render \
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>  -url https://example.com/ -out out.png -w 1024 -h 768
 </code></pre></div>
@@ -536,14 +576,15 @@ whole page. A <code>render</code> CLI is bundled:</p>
 <ul>
 <li><strong><a href="architecture/">Architecture</a></strong> — the packages, the reuse-vs-build decision,
   and why prior pure-Go browsers were studied but not built on.</li>
-<li><strong><a href="roadmap/">Roadmap</a></strong> — the Phase 0–3 plan from static render to
-  browserproxy.</li>
-<li><strong><a href="fidelity/">Fidelity</a></strong> — an honest account of what renders correctly today
-  and what does not.</li>
+<li><strong><a href="roadmap/">Roadmap</a></strong> — the phases from static render to the shipping
+  remote-browser proxy, and the remaining levers.</li>
+<li><strong><a href="fidelity/">Fidelity</a></strong> — an honest, measured account of what renders like a
+  browser today and what does not.</li>
 </ul>
 <h2 id="links">Links<a class="headerlink" href="#links" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Source: <a href="https://github.com/go-webengine/engine">https://github.com/go-webengine/engine</a></li>
+<li>Remote-browser service: <a href="https://github.com/go-webengine/browserproxy">https://github.com/go-webengine/browserproxy</a></li>
 <li>Landing: <a href="https://go-webengine.github.io/">https://go-webengine.github.io/</a></li>
 <li>License: BSD-3-Clause</li>
 </ul>
