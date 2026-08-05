@@ -9,11 +9,12 @@ Each stage is an owned package with a narrow contract, so the pure-logic stages
 | Package | Role |
 |---|---|
 | `dom` | An owned DOM node tree built from [`golang.org/x/net/html`](https://pkg.go.dev/golang.org/x/net/html) — a thin, owned wrapper so the rest of the engine never depends on `html.Node` directly. |
-| `css` | A minimal-but-real CSS subset: value model, stylesheet/declaration parser, tag/class/id selectors with specificity, a UA default stylesheet, and cascade + inheritance. Its own small tokenizer/parser, for full control and 100%-coverable pure logic. |
-| `layout` | Block-and-inline flow with a greedy word-wrap line-breaker and `white-space: pre`, driven through a `Measurer` interface so geometry is unit-testable **without fonts**. |
-| `paint` | Rasterises the box tree to `*image.RGBA`; also provides the real `Measurer` backed by go-opentype faces. |
-| `engine` (root) | The public API — `Fetch`, `Render`, `Screenshot`, `RenderInfo` — plus image sub-resource loading. |
-| `cmd/render` | A single-binary CLI: `render -url URL -out shot.png -w 1024 -h 768`. |
+| `css` | A real CSS subset: value model, stylesheet/declaration parser, tag/class/id + descendant/child/sibling combinators + `:checked`/`:not()` selectors with specificity, `var()` custom properties, `@media` width queries, modern colour, dark-mode, a UA default stylesheet, and cascade + inheritance. Its own small tokenizer/parser, for full control and coverable pure logic. |
+| `layout` | The full box model — block-and-inline flow, floats + clear, flexbox, CSS grid, tables, `position` (relative/absolute/fixed/sticky), margin collapsing, a greedy word-wrap line-breaker — driven through a `Measurer` interface so geometry is unit-testable **without fonts**. |
+| `js` | JavaScript execution via [goja](https://github.com/dop251/goja) bound to a minimal real DOM, with `fetch()`/XHR and read-back of real laid-out geometry (`getBoundingClientRect`, `offset*`, `getComputedStyle`). |
+| `paint` | Rasterises the box tree to `*image.RGBA` — AA text (real bold + italic), gradients, border-radius, box-shadow, opacity, images and SVG; also provides the real `Measurer` backed by go-opentype faces. |
+| `engine` (root) | The public API — `Fetch`, `Render`, `Screenshot`, `RenderHTML`, `RenderWithLinks`, `RenderInfo` — the settle-then-render loop, image + SVG sub-resource loading, and the anchor click hit-map. |
+| `cmd/render` | A single-binary CLI: `render -url URL -out shot.png -w 1024 -h 768` (or `-file page.html`). |
 
 ## The `Measurer` seam
 
@@ -34,12 +35,15 @@ whole engine builds with `CGO_ENABLED=0` and carries no copyleft.
 |---|---|
 | [`go-browserhttp/browserhttp`](https://github.com/go-browserhttp/browserhttp) | `http.Client` with a Chrome TLS fingerprint, cookie jar and redirect following. |
 | [`golang.org/x/net/html`](https://pkg.go.dev/golang.org/x/net/html) | HTML5 tokenizer + tree builder. |
-| [`go-opentype/opentype`](https://github.com/go-opentype/opentype) + [`fonts`](https://github.com/go-opentype/fonts) | Advance-width measurement and 8-bit AA glyph masks; embedded OFL sans/serif/mono faces. |
+| [`go-opentype/opentype`](https://github.com/go-opentype/opentype) + [`fonts`](https://github.com/go-opentype/fonts) | Advance-width measurement and 8-bit AA glyph masks; embedded OFL sans/serif/mono faces with real bold + italic. |
 | [`go-widgets/painter`](https://github.com/go-widgets/painter) | `FillRect` / clip for backgrounds onto the RGBA buffer. |
 | [`go-images/images`](https://github.com/go-images/images) | PNG/JPEG decode + resize for `<img>`. |
+| [`dop251/goja`](https://github.com/dop251/goja) | Pure-Go ES5.1 + most-ES2015 JavaScript engine, bound to the DOM by the `js` package. |
+| [`srwiley/oksvg`](https://github.com/srwiley/oksvg) + [`rasterx`](https://github.com/srwiley/rasterx) | Pure-Go SVG parse + rasterisation. |
 
-**Built clean-room** — the DOM wrapper, the CSS cascade + inheritance, the
-block/inline flow layout engine, and the paint orchestration + public API.
+**Built clean-room** — the DOM wrapper, the CSS cascade + inheritance + selector
+engine, the full box-model layout engine, the DOM binding for JS, and the paint
+orchestration + public API.
 
 ## Why not build on a prior pure-Go browser?
 

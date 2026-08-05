@@ -1,8 +1,9 @@
 site_name: go-webengine docs
 site_description: >-
   A pure-Go, CGO_ENABLED=0 headless web engine — fetch a URL, parse HTML into a
-  DOM, apply a real CSS cascade, lay out block-and-inline flow, and paint
-  anti-aliased text, backgrounds and images to an image. No Chromium, no cgo.
+  DOM, apply a real CSS cascade, run the page's JavaScript, lay out a full box
+  model (flex/grid/tables/position), and paint anti-aliased text, gradients,
+  images and SVG to an image. No Chromium, no cgo.
 site_url: https://go-webengine.github.io/docs/
 repo_url: https://github.com/go-webengine/engine
 repo_name: go-webengine/engine

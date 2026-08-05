@@ -1,47 +1,51 @@
 # Roadmap
 
-The engine grows in phases. Only **Phase 0 ships today**; the rest is the
-intended direction, stated honestly rather than promised.
+The engine grew in phases. **Phases 0 through 2.4 have shipped**, and the
+[`browserproxy`](https://github.com/go-webengine/browserproxy) remote-browser
+service that was the original Phase-3 goal is **live**. What remains is a set of
+honest levers, not a promise of a full browser. Measured fidelity is on the
+[Fidelity](fidelity.md) page; the phase-by-phase log with before/after numbers is
+in the engine's
+[`FIDELITY.md`](https://github.com/go-webengine/engine/blob/main/FIDELITY.md) and
+[`bench/REPORT.md`](https://github.com/go-webengine/engine/blob/main/bench/REPORT.md).
 
-## Phase 0 — Static renderer · shipping
+## Shipped
 
-A static (no-JavaScript) renderer end to end:
+| Phase | What landed |
+|---|---|
+| **0 — Static renderer** | HTML → owned DOM → real CSS cascade (specificity + inheritance) → block/inline flow → AA text/background/image paint → PNG. |
+| **1 — Real box model** | Floats + clear, flexbox, tables, painted borders, margin collapsing, `@media` width queries. |
+| **1.5 — CSS breadth I** | External `<link>` stylesheet fetch, `var()` custom properties, anchor **click hit-map** (`Links`). |
+| **1.7 — Flex + grid** | Complete flexbox and **CSS grid**. |
+| **1.8 — Positioning** | `position: relative / absolute / fixed / sticky`. |
+| **1.9 — CSS breadth II** | Modern colour (`rgb()`/`hsl()`), Tailwind variants, **border-radius**, dark-mode groundwork. |
+| **2.0 — Decorations** | **Linear/radial gradients**, `background-image: url()`, **box-shadow**, group **opacity**. |
+| **2 — JavaScript** | [goja](https://github.com/dop251/goja) bound to a real DOM with `fetch()`/XHR. |
+| **2.1 — SVG** | Pure-Go SVG rasterisation (oksvg + rasterx) for `<img *.svg>`, `data:` and inline `<svg>`. |
+| **2.2 — Dynamic render** | Layout↔JS metric read-back (`getBoundingClientRect`, `offset*`, `getComputedStyle`) + a **settle-then-render** bounded-fixpoint loop; runtime-injected `<script>`/`<style>`/`<link>`. |
+| **2.3 — Selector hack** | Sibling combinators `~`/`+`, **`:checked`**, **`:not()`** — the checkbox-hack that collapses MediaWiki dropdowns; "reduce, don't drop" for unmodelled selectors. |
+| **2.4 — JS on hit-map** | The `RenderWithLinks` path shares the JS-settled pipeline, so JS-built links land in the click hit-map. |
+| **Remote browser** | [`browserproxy`](https://github.com/go-webengine/browserproxy): a WebSocket service that renders server-side with the engine, streams frames + hit-map, forwards clicks/scrolls/keys, and guards against SSRF. **Shipping.** |
 
-- HTML parse → owned DOM.
-- A real CSS cascade: UA default stylesheet, `<style>` and inline `style=`,
-  tag/class/id selectors with specificity (inline > id > class > tag), and
-  inheritance.
-- Block-and-inline flow layout with a greedy word-wrap line-breaker and
-  `white-space: pre`.
-- Anti-aliased text (go-opentype) at the cascaded size, backgrounds, and
-  best-effort `<img>` (http(s) + `data:`, PNG/JPEG), painted to an
-  `image.RGBA` → PNG.
+Real bold + italic faces replaced the earlier faux-bold synthesis along the way.
 
-See [Fidelity](fidelity.md) for exactly what renders correctly and what does not.
+## Remaining levers (honest, not promised)
 
-## Phase 1 — Scripting · planned
+- **Fidelity residuals** — `<li>` `list-style` marker discs; icon-font /
+  `visually-hidden` chrome that renders as text; `conic-gradient`, CSS `filter`
+  and `mask`; SVG `<filter>`/`<mask>`/`<pattern>`/`<text>`/embedded `<image>`.
+- **Performance** — large computed pages (pkg.go.dev, go.dev) render slower than
+  Chrome; that is the next big lever, and it is a speed gap, not a fidelity one.
+- **Interaction depth in JS** — more of the CSSOM and event model, so highly
+  interactive SPAs settle closer to their browser state.
 
-Wire a pure-Go JavaScript engine ([goja](https://github.com/dop251/goja) — no
-cgo, ES5.1 + most ES2015) to the DOM so script-rendered content populates.
-Deferred deliberately: Phase 0 has no JS dependency at all.
-
-## Phase 2 — Real box model · planned
-
-`float` / `flex` / `grid` / table layout and absolute/fixed positioning, so
-modern page chrome (sidebars, nav bars, infoboxes) no longer linearises to a
-single column. Selector combinators, `max-width`/`min-width`, `line-height`,
-`border` and more CSS follow here. The clean CSS-selector upgrade path
-(cascadia / tdewolff) is already scoped in the survey.
-
-## Phase 3 — browserproxy · planned
-
-Render server-side and stream frames to the
-[wasmdesk](https://github.com/wasmdesk) `clients/browser` front-end — the
-original motivation for a headless, cgo-free engine that runs anywhere Go runs.
+These are diminishing-returns work: the mean windowed-SSIM across the five bench
+pages is already ≈ 0.69, and `example.com` is at near-parity (0.954).
 
 ## Non-goals (for now)
 
 - Being a full standards-compliant browser. This is a *renderer* with an honest,
-  growing feature set, not a Chromium replacement.
+  growing feature set — **not** a Chromium replacement, and not claimed to match
+  Chromium pixel-for-pixel.
 - cgo, a bundled browser binary, or a host web view — ever. Pure Go is the whole
   point.
