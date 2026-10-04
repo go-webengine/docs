@@ -365,6 +365,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#security" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#where-to-next" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -535,6 +546,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#security" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#where-to-next" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -636,6 +658,15 @@ page. A <code>render</code> CLI is bundled:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>go run github.com/go-webengine/engine/cmd/render \
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>  -url https://example.com/ -out out.png -w 1024 -h 768
 </code></pre></div>
+<h2 id="security">Security<a class="headerlink" href="#security" title="Permanent link">&para;</a></h2>
+<p>The engine fetches every resource a page names: images, stylesheets, fonts,
+scripts and modules, <code>fetch</code>/XHR targets and form posts. It does <strong>not</strong> filter
+destinations itself, so rendering an untrusted page from a machine with access to
+private networks can reach internal addresses. Embedding the engine directly means
+adding a dial-time guard through <code>Engine.Client</code> that refuses loopback, private and
+link-local addresses; the <a href="https://github.com/go-webengine/browserproxy">browserproxy</a>
+service ships one. Decoding is bounded: raster images declaring more than 25
+megapixels are refused, and every fetch is size-capped.</p>
 <h2 id="where-to-next">Where to next<a class="headerlink" href="#where-to-next" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong><a href="architecture/">Architecture</a></strong> — the packages, the reuse-vs-build decision,
