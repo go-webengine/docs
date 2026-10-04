@@ -598,6 +598,10 @@ in the engine's
 <td>The <code>RenderWithLinks</code> path shares the JS-settled pipeline, so JS-built links land in the click hit-map.</td>
 </tr>
 <tr>
+<td><strong>2.5 — Effects and layout</strong></td>
+<td><code>translate</code>/<code>rotate</code>, <code>filter</code>, <code>backdrop-filter</code>, <code>mask-image</code>, list markers, multi-column layout, <code>vertical-align</code> on table cells, <code>appearance: none</code> checkboxes, <code>@container</code>, declarative shadow DOM. Released as v0.4.0.</td>
+</tr>
+<tr>
 <td><strong>Remote browser</strong></td>
 <td><a href="https://github.com/go-webengine/browserproxy"><code>browserproxy</code></a>: a WebSocket service that renders server-side with the engine, streams frames + hit-map, forwards clicks/scrolls/keys, and guards against SSRF. <strong>Shipping.</strong></td>
 </tr>
@@ -606,16 +610,19 @@ in the engine's
 <p>Real bold + italic faces replaced the earlier faux-bold synthesis along the way.</p>
 <h2 id="remaining-levers-honest-not-promised">Remaining levers (honest, not promised)<a class="headerlink" href="#remaining-levers-honest-not-promised" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Fidelity residuals</strong> — <code>&lt;li&gt;</code> <code>list-style</code> marker discs; icon-font /
-  <code>visually-hidden</code> chrome that renders as text; <code>conic-gradient</code>, CSS <code>filter</code>
-  and <code>mask</code>; SVG <code>&lt;filter&gt;</code>/<code>&lt;mask&gt;</code>/<code>&lt;pattern&gt;</code>/<code>&lt;text&gt;</code>/embedded <code>&lt;image&gt;</code>.</li>
-<li><strong>Performance</strong> — large computed pages (pkg.go.dev, go.dev) render slower than
-  Chrome; that is the next big lever, and it is a speed gap, not a fidelity one.</li>
+<li><strong>Fidelity residuals</strong> — icon-font / <code>visually-hidden</code> chrome that renders as
+  text (generated <code>::before</code>/<code>::after</code> content); <code>conic-gradient</code> (recognised, not
+  painted); <code>scale</code>/<code>skew</code>; SVG <code>&lt;filter&gt;</code>/<code>&lt;mask&gt;</code>/<code>&lt;pattern&gt;</code>/<code>&lt;text&gt;</code>/embedded
+  <code>&lt;image&gt;</code>.</li>
+<li><strong>Performance</strong> — several pages (go.dev/blog, tailwindcss.com, pkg.go.dev) render
+  slower than Chrome. Measured causes so far: the per-host request cap, and the time
+  each rate-limited response costs. The cascade and the font downloads were the
+  recent wins (v0.4.0).</li>
 <li><strong>Interaction depth in JS</strong> — more of the CSSOM and event model, so highly
   interactive SPAs settle closer to their browser state.</li>
 </ul>
-<p>These are diminishing-returns work: the mean windowed-SSIM across the five bench
-pages is already ≈ 0.69, and <code>example.com</code> is at near-parity (0.954).</p>
+<p>These are diminishing-returns work: the mean windowed-SSIM across the ten bench
+pages is ≈ 0.66, and <code>example.com</code> is at near-parity (0.831 on the latest run).</p>
 <h2 id="non-goals-for-now">Non-goals (for now)<a class="headerlink" href="#non-goals-for-now" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Being a full standards-compliant browser. This is a <em>renderer</em> with an honest,

@@ -575,49 +575,88 @@ live network fetch, so they vary run to run.</p>
 <tbody>
 <tr>
 <td>example.com/</td>
-<td style="text-align: right;"><strong>0.954</strong></td>
-<td style="text-align: right;">1.5</td>
-<td style="text-align: right;">34.8</td>
-<td style="text-align: left;">near-parity, ~35× faster</td>
-</tr>
-<tr>
-<td>react.dev/</td>
-<td style="text-align: right;">0.727</td>
-<td style="text-align: right;">26.4</td>
-<td style="text-align: right;">1.15</td>
-<td style="text-align: left;">SPA; gradients + React SVG atom render</td>
-</tr>
-<tr>
-<td>go.dev/blog/</td>
-<td style="text-align: right;">0.670</td>
-<td style="text-align: right;">33.2</td>
-<td style="text-align: right;">0.34</td>
-<td style="text-align: left;">dark-mode + SVG logos render; slower</td>
-</tr>
-<tr>
-<td>pkg.go.dev/net/http</td>
-<td style="text-align: right;">0.629</td>
-<td style="text-align: right;">36.5</td>
-<td style="text-align: right;">0.14</td>
-<td style="text-align: left;">large computed page; perf gap</td>
+<td style="text-align: right;"><strong>0.831</strong></td>
+<td style="text-align: right;">5.6</td>
+<td style="text-align: right;">18.3</td>
+<td style="text-align: left;">near-parity; its JS cross-fade is not modelled</td>
 </tr>
 <tr>
 <td>en.wikipedia.org/wiki/Go</td>
-<td style="text-align: right;">0.441</td>
-<td style="text-align: right;">22.4</td>
-<td style="text-align: right;">1.20</td>
-<td style="text-align: left;">JS-confounded, noisy metric</td>
+<td style="text-align: right;">0.417</td>
+<td style="text-align: right;">30.3</td>
+<td style="text-align: right;">1.6</td>
+<td style="text-align: left;">live article; JS and rate-limited thumbnails</td>
+</tr>
+<tr>
+<td>pkg.go.dev/net/http</td>
+<td style="text-align: right;">0.716</td>
+<td style="text-align: right;">11.3</td>
+<td style="text-align: right;">0.8</td>
+<td style="text-align: left;">large computed page</td>
+</tr>
+<tr>
+<td>go.dev/blog/</td>
+<td style="text-align: right;">0.700</td>
+<td style="text-align: right;">16.6</td>
+<td style="text-align: right;">0.45</td>
+<td style="text-align: left;">slower than Chrome</td>
+</tr>
+<tr>
+<td>react.dev/</td>
+<td style="text-align: right;">0.725</td>
+<td style="text-align: right;">33.0</td>
+<td style="text-align: right;">1.3</td>
+<td style="text-align: left;">SPA; hydration fails, so the static fallback renders</td>
+</tr>
+<tr>
+<td>news.ycombinator.com/</td>
+<td style="text-align: right;">0.615</td>
+<td style="text-align: right;">13.7</td>
+<td style="text-align: right;">1.75</td>
+<td style="text-align: left;">table layout; rotating front page</td>
+</tr>
+<tr>
+<td>developer.mozilla.org/…/CSS</td>
+<td style="text-align: right;">0.606</td>
+<td style="text-align: right;">18.1</td>
+<td style="text-align: right;">3.3</td>
+<td style="text-align: left;">docs layout</td>
+</tr>
+<tr>
+<td>github.com/golang/go</td>
+<td style="text-align: right;">0.637</td>
+<td style="text-align: right;">14.2</td>
+<td style="text-align: right;">2.0</td>
+<td style="text-align: left;">live repository counters</td>
+</tr>
+<tr>
+<td>tailwindcss.com/</td>
+<td style="text-align: right;">0.724</td>
+<td style="text-align: right;">12.2</td>
+<td style="text-align: right;">0.5</td>
+<td style="text-align: left;">sponsor carousel rotates; slower</td>
+</tr>
+<tr>
+<td>caniuse.com/</td>
+<td style="text-align: right;">0.660</td>
+<td style="text-align: right;">18.0</td>
+<td style="text-align: right;">0.8</td>
+<td style="text-align: left;">data grid</td>
 </tr>
 </tbody>
 </table>
-<p>Mean windowed-SSIM ≈ <strong>0.69</strong>. <code>example.com</code> is at near-parity and much faster;
-the JS-heavy and large computed pages are the honest frontier. The Wikipedia
-number is confounded by runtime JS chrome and swings run-to-run around 0.44.</p>
+<p>Mean SSIM over the ten pages is <strong>≈ 0.66</strong>. Summed over the run, webengine took
+26.1 s and headless Chrome 26.3 s, so overall time is at parity, but the per-page
+spread is wide. The Wikipedia number is confounded by runtime JS chrome and by
+rate-limited image thumbnails.</p>
 <h2 id="works-today">Works today<a class="headerlink" href="#works-today" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>Full box-model layout</strong>: block/inline flow, floats + clear, flexbox, CSS
-  grid, tables, <code>position</code> (relative/absolute/fixed/sticky), margin collapsing,
-  greedy word-wrap.</li>
+  grid, tables (with <code>vertical-align</code> on cells), <code>position</code>
+  (relative/absolute/fixed/sticky), margin collapsing, greedy word-wrap, multi-column
+  layout.</li>
+<li><strong>Effects and lists</strong>: <code>translate</code>/<code>rotate</code>, <code>filter</code>, <code>backdrop-filter</code>,
+  <code>mask-image</code> (a single <code>url()</code> mask), <code>ul</code>/<code>ol</code> list markers.</li>
 <li><strong>CSS</strong>: cascade + specificity (inline &gt; id &gt; class &gt; tag) + inheritance;
   <code>var()</code> custom properties; <code>@media</code> width queries; <strong>dark-mode</strong>
   (<code>prefers-color-scheme</code>); external <code>&lt;link&gt;</code> stylesheets; UA defaults.</li>
@@ -641,11 +680,16 @@ number is confounded by runtime JS chrome and swings run-to-run around 0.44.</p>
 </ul>
 <h2 id="not-supported-yet-stated-not-hidden">Not supported yet (stated, not hidden)<a class="headerlink" href="#not-supported-yet-stated-not-hidden" title="Permanent link">&para;</a></h2>
 <ul>
-<li>No <code>conic-gradient</code>, CSS <code>filter</code> or <code>mask</code>. SVG has no <code>&lt;filter&gt;</code>/<code>&lt;mask&gt;</code>/
-  <code>&lt;pattern&gt;</code>/<code>&lt;text&gt;</code>/embedded <code>&lt;image&gt;</code>, and a per-page image budget caps very
-  icon-heavy pages.</li>
-<li>No <code>&lt;li&gt;</code> <code>list-style</code> marker discs; some icon-font / <code>visually-hidden</code> chrome
-  renders as text where a browser shows an icon.</li>
+<li><code>conic-gradient</code> is recognised but not painted. <code>filter</code> and <code>mask-image</code> are
+  modelled narrowly: a mask is a single <code>url()</code> stretched over the box. <code>scale</code>
+  and <code>skew</code> are not supported. SVG has no <code>&lt;filter&gt;</code>/<code>&lt;mask&gt;</code>/<code>&lt;pattern&gt;</code>/
+  <code>&lt;text&gt;</code>/embedded <code>&lt;image&gt;</code>, and a per-page image budget caps very icon-heavy
+  pages.</li>
+<li><code>::before</code>/<code>::after</code> generated content is not synthesised, so some icon-font and
+  <code>visually-hidden</code> chrome renders as text where a browser shows an icon.</li>
+<li>Rate-limited image hosts (Wikimedia) answer some requests with HTTP 429. The
+  engine retries them and the renders are identical, but each retry adds about two
+  seconds to that page.</li>
 <li>Large computed pages (pkg.go.dev, go.dev) render <strong>slower</strong> than Chrome — a perf
   gap, not a fidelity one.</li>
 <li>This is <strong>not</strong> a standards-complete browser and is <strong>not</strong> claimed to match
