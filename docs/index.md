@@ -19,6 +19,8 @@ server renders pages and streams frames (plus a click hit-map) to a thin client.
   `rgb()`/`hsl()`, **linear/radial gradients**, `background-image`, border +
   **border-radius**, **box-shadow**, opacity; sibling combinators, `:checked`,
   `:not()`.
+- **Effects and layout**: `translate`/`rotate`, `filter`, `mask-image`, list
+  markers, multi-column layout, `vertical-align` on table cells.
 - **Text**: anti-aliased serif/sans/mono with **real bold and italic** faces.
 - **Images**: PNG/JPEG, `data:`, and **SVG** (`<img>`, `data:` and inline `<svg>`).
 - **JavaScript**: page scripts run via [goja](https://github.com/dop251/goja)

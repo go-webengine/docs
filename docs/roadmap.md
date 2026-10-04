@@ -25,22 +25,26 @@ in the engine's
 | **2.2 — Dynamic render** | Layout↔JS metric read-back (`getBoundingClientRect`, `offset*`, `getComputedStyle`) + a **settle-then-render** bounded-fixpoint loop; runtime-injected `<script>`/`<style>`/`<link>`. |
 | **2.3 — Selector hack** | Sibling combinators `~`/`+`, **`:checked`**, **`:not()`** — the checkbox-hack that collapses MediaWiki dropdowns; "reduce, don't drop" for unmodelled selectors. |
 | **2.4 — JS on hit-map** | The `RenderWithLinks` path shares the JS-settled pipeline, so JS-built links land in the click hit-map. |
+| **2.5 — Effects and layout** | `translate`/`rotate`, `filter`, `backdrop-filter`, `mask-image`, list markers, multi-column layout, `vertical-align` on table cells, `appearance: none` checkboxes, `@container`, declarative shadow DOM. Released as v0.4.0. |
 | **Remote browser** | [`browserproxy`](https://github.com/go-webengine/browserproxy): a WebSocket service that renders server-side with the engine, streams frames + hit-map, forwards clicks/scrolls/keys, and guards against SSRF. **Shipping.** |
 
 Real bold + italic faces replaced the earlier faux-bold synthesis along the way.
 
 ## Remaining levers (honest, not promised)
 
-- **Fidelity residuals** — `<li>` `list-style` marker discs; icon-font /
-  `visually-hidden` chrome that renders as text; `conic-gradient`, CSS `filter`
-  and `mask`; SVG `<filter>`/`<mask>`/`<pattern>`/`<text>`/embedded `<image>`.
-- **Performance** — large computed pages (pkg.go.dev, go.dev) render slower than
-  Chrome; that is the next big lever, and it is a speed gap, not a fidelity one.
+- **Fidelity residuals** — icon-font / `visually-hidden` chrome that renders as
+  text (generated `::before`/`::after` content); `conic-gradient` (recognised, not
+  painted); `scale`/`skew`; SVG `<filter>`/`<mask>`/`<pattern>`/`<text>`/embedded
+  `<image>`.
+- **Performance** — several pages (go.dev/blog, tailwindcss.com, pkg.go.dev) render
+  slower than Chrome. Measured causes so far: the per-host request cap, and the time
+  each rate-limited response costs. The cascade and the font downloads were the
+  recent wins (v0.4.0).
 - **Interaction depth in JS** — more of the CSSOM and event model, so highly
   interactive SPAs settle closer to their browser state.
 
-These are diminishing-returns work: the mean windowed-SSIM across the five bench
-pages is already ≈ 0.69, and `example.com` is at near-parity (0.954).
+These are diminishing-returns work: the mean windowed-SSIM across the ten bench
+pages is ≈ 0.66, and `example.com` is at near-parity (0.831 on the latest run).
 
 ## Non-goals (for now)
 
