@@ -15,21 +15,30 @@ live network fetch, so they vary run to run.
 
 | URL | SSIM | pixdiff % | speed× | note |
 |-----|-----:|----------:|-------:|:-----|
-| example.com/ | **0.954** | 1.5 | 34.8 | near-parity, ~35× faster |
-| react.dev/ | 0.727 | 26.4 | 1.15 | SPA; gradients + React SVG atom render |
-| go.dev/blog/ | 0.670 | 33.2 | 0.34 | dark-mode + SVG logos render; slower |
-| pkg.go.dev/net/http | 0.629 | 36.5 | 0.14 | large computed page; perf gap |
-| en.wikipedia.org/wiki/Go | 0.441 | 22.4 | 1.20 | JS-confounded, noisy metric |
+| example.com/ | **0.831** | 5.6 | 18.3 | near-parity; its JS cross-fade is not modelled |
+| en.wikipedia.org/wiki/Go | 0.417 | 30.3 | 1.6 | live article; JS and rate-limited thumbnails |
+| pkg.go.dev/net/http | 0.716 | 11.3 | 0.8 | large computed page |
+| go.dev/blog/ | 0.700 | 16.6 | 0.45 | slower than Chrome |
+| react.dev/ | 0.725 | 33.0 | 1.3 | SPA; hydration fails, so the static fallback renders |
+| news.ycombinator.com/ | 0.615 | 13.7 | 1.75 | table layout; rotating front page |
+| developer.mozilla.org/…/CSS | 0.606 | 18.1 | 3.3 | docs layout |
+| github.com/golang/go | 0.637 | 14.2 | 2.0 | live repository counters |
+| tailwindcss.com/ | 0.724 | 12.2 | 0.5 | sponsor carousel rotates; slower |
+| caniuse.com/ | 0.660 | 18.0 | 0.8 | data grid |
 
-Mean windowed-SSIM ≈ **0.69**. `example.com` is at near-parity and much faster;
-the JS-heavy and large computed pages are the honest frontier. The Wikipedia
-number is confounded by runtime JS chrome and swings run-to-run around 0.44.
+Mean SSIM over the ten pages is **≈ 0.66**. Summed over the run, webengine took
+26.1 s and headless Chrome 26.3 s, so overall time is at parity, but the per-page
+spread is wide. The Wikipedia number is confounded by runtime JS chrome and by
+rate-limited image thumbnails.
 
 ## Works today
 
 - **Full box-model layout**: block/inline flow, floats + clear, flexbox, CSS
-  grid, tables, `position` (relative/absolute/fixed/sticky), margin collapsing,
-  greedy word-wrap.
+  grid, tables (with `vertical-align` on cells), `position`
+  (relative/absolute/fixed/sticky), margin collapsing, greedy word-wrap, multi-column
+  layout.
+- **Effects and lists**: `translate`/`rotate`, `filter`, `backdrop-filter`,
+  `mask-image` (a single `url()` mask), `ul`/`ol` list markers.
 - **CSS**: cascade + specificity (inline > id > class > tag) + inheritance;
   `var()` custom properties; `@media` width queries; **dark-mode**
   (`prefers-color-scheme`); external `<link>` stylesheets; UA defaults.
@@ -53,11 +62,16 @@ number is confounded by runtime JS chrome and swings run-to-run around 0.44.
 
 ## Not supported yet (stated, not hidden)
 
-- No `conic-gradient`, CSS `filter` or `mask`. SVG has no `<filter>`/`<mask>`/
-  `<pattern>`/`<text>`/embedded `<image>`, and a per-page image budget caps very
-  icon-heavy pages.
-- No `<li>` `list-style` marker discs; some icon-font / `visually-hidden` chrome
-  renders as text where a browser shows an icon.
+- `conic-gradient` is recognised but not painted. `filter` and `mask-image` are
+  modelled narrowly: a mask is a single `url()` stretched over the box. `scale`
+  and `skew` are not supported. SVG has no `<filter>`/`<mask>`/`<pattern>`/
+  `<text>`/embedded `<image>`, and a per-page image budget caps very icon-heavy
+  pages.
+- `::before`/`::after` generated content is not synthesised, so some icon-font and
+  `visually-hidden` chrome renders as text where a browser shows an icon.
+- Rate-limited image hosts (Wikimedia) answer some requests with HTTP 429. The
+  engine retries them and the renders are identical, but each retry adds about two
+  seconds to that page.
 - Large computed pages (pkg.go.dev, go.dev) render **slower** than Chrome — a perf
   gap, not a fidelity one.
 - This is **not** a standards-complete browser and is **not** claimed to match
