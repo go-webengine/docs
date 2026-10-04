@@ -74,6 +74,17 @@ go run github.com/go-webengine/engine/cmd/render \
   -url https://example.com/ -out out.png -w 1024 -h 768
 ```
 
+## Security
+
+The engine fetches every resource a page names: images, stylesheets, fonts,
+scripts and modules, `fetch`/XHR targets and form posts. It does **not** filter
+destinations itself, so rendering an untrusted page from a machine with access to
+private networks can reach internal addresses. Embedding the engine directly means
+adding a dial-time guard through `Engine.Client` that refuses loopback, private and
+link-local addresses; the [browserproxy](https://github.com/go-webengine/browserproxy)
+service ships one. Decoding is bounded: raster images declaring more than 25
+megapixels are refused, and every fetch is size-capped.
+
 ## Where to next
 
 - **[Architecture](architecture.md)** — the packages, the reuse-vs-build decision,
