@@ -1,15 +1,20 @@
-# Roadmap
+---
+title: "Roadmap"
+weight: 30
+---
+
+# Roadmap {#roadmap}
 
 The engine grew in phases. **Phases 0 through 2.4 have shipped**, and the
 [`browserproxy`](https://github.com/go-webengine/browserproxy) remote-browser
 service that was the original Phase-3 goal is **live**. What remains is a set of
 honest levers, not a promise of a full browser. Measured fidelity is on the
-[Fidelity](fidelity.md) page; the phase-by-phase log with before/after numbers is
+[Fidelity]({{< relref "fidelity.md" >}}) page; the phase-by-phase log with before/after numbers is
 in the engine's
 [`FIDELITY.md`](https://github.com/go-webengine/engine/blob/main/FIDELITY.md) and
 [`bench/REPORT.md`](https://github.com/go-webengine/engine/blob/main/bench/REPORT.md).
 
-## Shipped
+## Shipped {#shipped}
 
 | Phase | What landed |
 |---|---|
@@ -30,7 +35,7 @@ in the engine's
 
 Real bold + italic faces replaced the earlier faux-bold synthesis along the way.
 
-## Remaining levers (honest, not promised)
+## Remaining levers (honest, not promised) {#remaining-levers-honest-not-promised}
 
 - **Fidelity residuals** — icon-font / `visually-hidden` chrome that renders as
   text (generated `::before`/`::after` content); `conic-gradient` (recognised, not
@@ -46,7 +51,7 @@ Real bold + italic faces replaced the earlier faux-bold synthesis along the way.
 These are diminishing-returns work: the mean windowed-SSIM across the ten bench
 pages is ≈ 0.66, and `example.com` is at near-parity (0.831 on the latest run).
 
-## Non-goals (for now)
+## Non-goals (for now) {#non-goals-for-now}
 
 - Being a full standards-compliant browser. This is a *renderer* with an honest,
   growing feature set — **not** a Chromium replacement, and not claimed to match

@@ -1,4 +1,9 @@
-# go-webengine
+---
+title: "Home"
+weight: 10
+---
+
+# go-webengine {#go-webengine}
 
 A pure-Go, **`CGO_ENABLED=0`** headless web engine. Give it a URL, get back an
 **image of the page** — HTML/CSS layout and paint, with **JavaScript executed**
@@ -9,7 +14,7 @@ It is the rendering core of the
 service and the [wasmdesk](https://github.com/wasmdesk) in-desktop browser: a
 server renders pages and streams frames (plus a click hit-map) to a thin client.
 
-## What it renders today
+## What it renders today {#what-it-renders-today}
 
 - **Full box-model layout**: block, inline, floats + clear, **flexbox**, **CSS
   grid**, **tables**, **`position`** (relative/absolute/fixed/sticky), margin
@@ -27,10 +32,10 @@ server renders pages and streams frames (plus a click hit-map) to a thin client.
   against a real DOM with `fetch()`/XHR and laid-out-geometry read-back; a
   settle-then-render loop reflects script-driven DOM mutations in the output.
 
-See **[Fidelity](fidelity.md)** for the honest, measured account of what matches a
+See **[Fidelity]({{< relref "fidelity.md" >}})** for the honest, measured account of what matches a
 browser and what does not.
 
-## Pipeline
+## Pipeline {#pipeline}
 
 ```
 Fetch (go-browserhttp)  →  Parse (x/net/html → dom)  →  Cascade (css: +var()/@media/dark-mode)
@@ -41,7 +46,7 @@ Fetch (go-browserhttp)  →  Parse (x/net/html → dom)  →  Cascade (css: +var
      →  image.RGBA  →  PNG (+ optional link hit-map)
 ```
 
-## Quickstart
+## Quickstart {#quickstart}
 
 ```go
 import (
@@ -74,7 +79,7 @@ go run github.com/go-webengine/engine/cmd/render \
   -url https://example.com/ -out out.png -w 1024 -h 768
 ```
 
-## Security
+## Security {#security}
 
 The engine fetches every resource a page names: images, stylesheets, fonts,
 scripts and modules, `fetch`/XHR targets and form posts. It does **not** filter
@@ -113,16 +118,16 @@ for the full measured writeups. None of this changes how a well-formed page
 renders — only how a pathological one degrades (truncated output, never a
 crash or unbounded allocation).
 
-## Where to next
+## Where to next {#where-to-next}
 
-- **[Architecture](architecture.md)** — the packages, the reuse-vs-build decision,
+- **[Architecture]({{< relref "architecture.md" >}})** — the packages, the reuse-vs-build decision,
   and why prior pure-Go browsers were studied but not built on.
-- **[Roadmap](roadmap.md)** — the phases from static render to the shipping
+- **[Roadmap]({{< relref "roadmap.md" >}})** — the phases from static render to the shipping
   remote-browser proxy, and the remaining levers.
-- **[Fidelity](fidelity.md)** — an honest, measured account of what renders like a
+- **[Fidelity]({{< relref "fidelity.md" >}})** — an honest, measured account of what renders like a
   browser today and what does not.
 
-## Links
+## Links {#links}
 
 - Source: <https://github.com/go-webengine/engine>
 - Remote-browser service: <https://github.com/go-webengine/browserproxy>

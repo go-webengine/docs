@@ -1,4 +1,9 @@
-# Fidelity
+---
+title: "Fidelity"
+weight: 40
+---
+
+# Fidelity {#fidelity}
 
 An honest account of what the renderer matches in a browser and what it does not.
 The authoritative, per-page and per-phase assessment (five live pages, committed
@@ -7,7 +12,7 @@ golden PNGs, before/after deltas) lives in the engine's
 the measured-vs-Chrome numbers in
 [`bench/REPORT.md`](https://github.com/go-webengine/engine/blob/main/bench/REPORT.md).
 
-## Measured vs headless Chrome
+## Measured vs headless Chrome {#measured-vs-headless-chrome}
 
 Windowed SSIM (`1.0` = identical) over the common top-left region at 1024px width;
 `speed×` = `chrome_ms / webengine_ms` (>1 = webengine faster). Timings include the
@@ -31,7 +36,7 @@ Mean SSIM over the ten pages is **≈ 0.66**. Summed over the run, webengine too
 spread is wide. The Wikipedia number is confounded by runtime JS chrome and by
 rate-limited image thumbnails.
 
-## Works today
+## Works today {#works-today}
 
 - **Full box-model layout**: block/inline flow, floats + clear, flexbox, CSS
   grid, tables (with `vertical-align` on cells), `position`
@@ -60,7 +65,7 @@ rate-limited image thumbnails.
   dynamically injected `<script>`/`<style>`/`<link>`), to a bounded fixpoint. The
   same JS-settled DOM drives the click hit-map.
 
-## Not supported yet (stated, not hidden)
+## Not supported yet (stated, not hidden) {#not-supported-yet-stated-not-hidden}
 
 - `conic-gradient` is recognised but not painted. `filter` and `mask-image` are
   modelled narrowly: a mask is a single `url()` stretched over the box. `scale`
@@ -76,9 +81,9 @@ rate-limited image thumbnails.
   gap, not a fidelity one.
 - This is **not** a standards-complete browser and is **not** claimed to match
   Chromium pixel-for-pixel. It is an honest renderer whose gap to a browser is
-  the [roadmap](roadmap.md), measured page by page rather than asserted.
+  the [roadmap]({{< relref "roadmap.md" >}}), measured page by page rather than asserted.
 
-## How to read a render
+## How to read a render {#how-to-read-a-render}
 
 `example.com` renders at near-parity. A JS-driven SPA (react.dev) renders its
 gradients, SVG atoms and script-built content and lands around 0.73 SSIM. A large
@@ -86,4 +91,4 @@ computed docs page (pkg.go.dev) renders correctly but slower than Chrome. A mode
 CMS page (Wikipedia) collapses its Vector-2022 chrome via the checkbox-hack and
 `mw.loader`, but the SSIM stays noisy where runtime chrome and icon fonts differ —
 the residual is documented, not hidden. The gap between these is exactly the
-remaining-levers section of the [roadmap](roadmap.md).
+remaining-levers section of the [roadmap]({{< relref "roadmap.md" >}}).

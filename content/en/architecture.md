@@ -1,10 +1,15 @@
-# Architecture
+---
+title: "Architecture"
+weight: 20
+---
+
+# Architecture {#architecture}
 
 The engine is a linear pipeline from bytes on the wire to pixels in an image.
 Each stage is an owned package with a narrow contract, so the pure-logic stages
 (cascade, layout, DOM) stay testable without a network or fonts.
 
-## Packages
+## Packages {#packages}
 
 | Package | Role |
 |---|---|
@@ -16,7 +21,7 @@ Each stage is an owned package with a narrow contract, so the pure-logic stages
 | `engine` (root) | The public API — `Fetch`, `Render`, `Screenshot`, `RenderHTML`, `RenderWithLinks`, `RenderInfo` — the settle-then-render loop, image + SVG sub-resource loading, and the anchor click hit-map. |
 | `cmd/render` | A single-binary CLI: `render -url URL -out shot.png -w 1024 -h 768` (or `-file page.html`). |
 
-## The `Measurer` seam
+## The `Measurer` seam {#the-measurer-seam}
 
 Layout never touches a font directly. It asks a `Measurer` for advance widths and
 line metrics. In production the measurer is backed by go-opentype faces; in tests
@@ -24,7 +29,7 @@ it is a deterministic fake, so box geometry can be asserted at **exact pixel
 positions** with no font files and no anti-aliasing noise. This is why the layout
 and cascade packages carry very high statement coverage.
 
-## Reuse vs build
+## Reuse vs build {#reuse-vs-build}
 
 Everything reused is pure-Go and permissively licensed (BSD-2/BSD-3/MIT), so the
 whole engine builds with `CGO_ENABLED=0` and carries no copyleft.
@@ -45,7 +50,7 @@ whole engine builds with `CGO_ENABLED=0` and carries no copyleft.
 engine, the full box-model layout engine, the DOM binding for JS, and the paint
 orchestration + public API.
 
-## Why not build on a prior pure-Go browser?
+## Why not build on a prior pure-Go browser? {#why-not-build-on-a-prior-pure-go-browser}
 
 The prior pure-Go browser engine `opossum` (renamed to
 [`mycel`](https://github.com/psilva261/mycel)) was studied in depth. Its choice
@@ -58,7 +63,7 @@ it cannot give us, so the layout/box/flow engine here is clean-room. The full
 prior-art verdict lives in the engine's
 [`SURVEY.md`](https://github.com/go-webengine/engine/blob/main/SURVEY.md).
 
-## Portability & testing
+## Portability & testing {#portability-testing}
 
 Pure Go with `CGO_ENABLED=0`; cross-built in CI for all six of Go's 64-bit
 targets (amd64, arm64, riscv64, loong64, ppc64le, s390x). A ratchet coverage gate
