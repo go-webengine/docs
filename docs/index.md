@@ -101,6 +101,12 @@ capped, each confirmed live against a synthetic reproduction:
   the HTML→DOM conversion shared by `Parse`/`ParseFragment`/`innerHTML` now
   cap total node count per call; the rendered canvas is capped by pixel
   count.
+- **Unresponsive render on ordinary content**: a real, non-malicious page
+  with several `background-repeat` sections could take over a minute to
+  paint — each stamped pixel went through an interface call that both
+  allocated and re-derived colour math that only needed doing once per
+  source tile, not once per painted pixel. Fixed by converting the tile to
+  a fast, direct-access format once, before the repeat loop runs.
 
 See the [engine's `FIDELITY.md`](https://github.com/go-webengine/engine/blob/main/FIDELITY.md)
 for the full measured writeups. None of this changes how a well-formed page
