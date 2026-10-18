@@ -82,8 +82,30 @@ destinations itself, so rendering an untrusted page from a machine with access t
 private networks can reach internal addresses. Embedding the engine directly means
 adding a dial-time guard through `Engine.Client` that refuses loopback, private and
 link-local addresses; the [browserproxy](https://github.com/go-webengine/browserproxy)
-service ships one. Decoding is bounded: raster images declaring more than 25
-megapixels are refused, and every fetch is size-capped.
+service ships one.
+
+Since a renderer's whole job is turning arbitrary, untrusted page content into
+output, several unrelated kinds of pathological input have been found and
+capped, each confirmed live against a synthetic reproduction:
+
+- **Decoding**: raster images declaring more than 25 megapixels are refused
+  before decode; every fetch is size-capped.
+- **Tree-depth recursion**: a script-built DOM tree past 512 levels used to
+  crash the whole process with an unrecoverable stack overflow in the CSS
+  cascade, layout, `cloneNode`/`isEqualNode`, and three CSS parsers (`calc()`,
+  `:not()`/`:has()`/`:host()`, `:is()`/`:where()`/`:matches()`). All are now
+  capped at 512 or a generous output budget.
+- **Memory exhaustion**: a single `innerHTML` assignment, or a `cloneNode`
+  call repeated in a loop, could previously allocate tens of gigabytes of
+  real memory from a few lines of ordinary-looking script. `cloneNode` and
+  the HTML→DOM conversion shared by `Parse`/`ParseFragment`/`innerHTML` now
+  cap total node count per call; the rendered canvas is capped by pixel
+  count.
+
+See the [engine's `FIDELITY.md`](https://github.com/go-webengine/engine/blob/main/FIDELITY.md)
+for the full measured writeups. None of this changes how a well-formed page
+renders — only how a pathological one degrades (truncated output, never a
+crash or unbounded allocation).
 
 ## Where to next
 
