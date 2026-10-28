@@ -43,7 +43,18 @@ rate-limited image thumbnails.
   (relative/absolute/fixed/sticky), margin collapsing, greedy word-wrap, multi-column
   layout.
 - **Effects and lists**: `translate`/`rotate`, `filter`, `backdrop-filter`,
-  `mask-image` (a single `url()` mask), `ul`/`ol` list markers.
+  `mask-image` (a single `url()` mask). `ul`/`ol` list markers are generated in
+  layout as a `::marker` box, so every backend gets them as text (the raster
+  canvas, the vector PDF, go-pdfkit/html2pdf): `list-style-type` `disc`,
+  `circle`, `square`, `decimal`, `decimal-leading-zero`, `lower-`/`upper-alpha`,
+  `lower-`/`upper-roman`, a `<string>` and `none`; `list-style-position`
+  `outside`/`inside`; `::marker` colour, font and `content`; HTML `start`,
+  `reversed`, `value` and `type` (engine v0.18.0).
+- **Generated content and counters**: `::before`/`::after` with strings,
+  `counter()` and `counters()`; `counter-reset` (with `reversed()`),
+  `counter-increment`, `counter-set`, scoped and inherited per CSS Lists 3, and
+  the implicit `list-item` counter. CSS escapes (`"\2022\00a0"`, `.\31 0`) are
+  decoded in every string, identifier and selector.
 - **CSS**: cascade + specificity (inline > id > class > tag) + inheritance;
   `var()` custom properties; `@media` width queries; **dark-mode**
   (`prefers-color-scheme`); external `<link>` stylesheets; UA defaults.
@@ -72,8 +83,9 @@ rate-limited image thumbnails.
   and `skew` are not supported. SVG has no `<filter>`/`<mask>`/`<pattern>`/
   `<text>`/embedded `<image>`, and a per-page image budget caps very icon-heavy
   pages.
-- `::before`/`::after` generated content is not synthesised, so some icon-font and
-  `visually-hidden` chrome renders as text where a browser shows an icon.
+- `::before`/`::after` take strings, `counter()` and `counters()`; `attr()`,
+  `url()` and the quote keywords are not supported, nor is `@counter-style` or
+  `list-style-image`. A form control's own `::before`/`::after` is not drawn.
 - Rate-limited image hosts (Wikimedia) answer some requests with HTTP 429. The
   engine retries them and the renders are identical, but each retry adds about two
   seconds to that page.

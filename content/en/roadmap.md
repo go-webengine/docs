@@ -31,14 +31,15 @@ in the engine's
 | **2.3 — Selector hack** | Sibling combinators `~`/`+`, **`:checked`**, **`:not()`** — the checkbox-hack that collapses MediaWiki dropdowns; "reduce, don't drop" for unmodelled selectors. |
 | **2.4 — JS on hit-map** | The `RenderWithLinks` path shares the JS-settled pipeline, so JS-built links land in the click hit-map. |
 | **2.5 — Effects and layout** | `translate`/`rotate`, `filter`, `backdrop-filter`, `mask-image`, list markers, multi-column layout, `vertical-align` on table cells, `appearance: none` checkboxes, `@container`, declarative shadow DOM. Released as v0.4.0. |
+| **2.6 — Lists and counters** | List markers as text for every backend (`::marker`, `list-style-type` counter styles and strings, `inside`), CSS counters (`counter-reset`/`-increment`/`-set`, `counter()`/`counters()`), CSS escapes decoded everywhere. Released as v0.18.0. |
 | **Remote browser** | [`browserproxy`](https://github.com/go-webengine/browserproxy): a WebSocket service that renders server-side with the engine, streams frames + hit-map, forwards clicks/scrolls/keys, and guards against SSRF. **Shipping.** |
 
 Real bold + italic faces replaced the earlier faux-bold synthesis along the way.
 
 ## Remaining levers (honest, not promised) {#remaining-levers-honest-not-promised}
 
-- **Fidelity residuals** — icon-font / `visually-hidden` chrome that renders as
-  text (generated `::before`/`::after` content); `conic-gradient` (recognised, not
+- **Fidelity residuals** — the rest of the `content` grammar (`attr()`, `url()`,
+  quotes), `@counter-style`, `list-style-image`; `conic-gradient` (recognised, not
   painted); `scale`/`skew`; SVG `<filter>`/`<mask>`/`<pattern>`/`<text>`/embedded
   `<image>`.
 - **Performance** — several pages (go.dev/blog, tailwindcss.com, pkg.go.dev) render
