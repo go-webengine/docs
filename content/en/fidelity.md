@@ -39,7 +39,9 @@ rate-limited image thumbnails.
 ## Works today {#works-today}
 
 - **Full box-model layout**: block/inline flow, floats + clear, flexbox, CSS
-  grid, tables (with `vertical-align` on cells), `position`
+  grid, tables (with `vertical-align` on cells; a `display:block` table keeps
+  its grid, CSS 2.1 §17.2.1, engine v0.45.10; `width: min-content | max-content |
+  fit-content`), `position`
   (relative/absolute/fixed/sticky), margin collapsing, greedy word-wrap, multi-column
   layout.
 - **Effects and lists**: `translate`/`rotate`, `filter`, `backdrop-filter`,
@@ -62,11 +64,16 @@ rate-limited image thumbnails.
   combinators, **`:checked`**, **`:not()`** (the checkbox-hack that collapses
   MediaWiki dropdowns); unmodelled selectors reduce rather than drop the rule.
 - **Colour & decoration**: named/`#rgb`/`#rrggbb`, modern `rgb()`/`hsl()`,
-  `background-color`, **linear/radial gradients**, `background-image: url()`,
+  `background-color`, **linear/radial gradients** (with `background-size`,
+  `background-position` and `background-repeat`, engine v0.45.10), `background-image: url()`,
   border + **border-radius**, **box-shadow**, group **opacity**.
 - **Text**: anti-aliased proportional text with **real bold and italic** faces
   (no faux-bold); serif / sans / mono; complex scripts (Cyrillic, Vietnamese, …);
-  `white-space: pre`.
+  `white-space: pre`; **variable fonts** drawn at each `font-weight` through
+  their `wght` axis (v0.45.10; the bundled Inter and Lora regulars too, so 300
+  and 500 are their own weights); the `font` shorthand (v0.45.11). The `render`
+  CLI with `-file` uses the file's directory as its base, so a relative
+  `@font-face` font beside it loads.
 - **Images**: `<img>` over http(s) + `data:` (PNG/JPEG) and **SVG** (oksvg/rasterx)
   via `<img *.svg>`, `data:image/svg+xml` and inline `<svg>`.
 - **JavaScript**: page scripts run via [goja](https://github.com/dop251/goja)
