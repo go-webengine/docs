@@ -69,7 +69,10 @@ rate-limited image thumbnails.
   border + **border-radius**, **box-shadow**, group **opacity**.
 - **Text**: anti-aliased proportional text with **real bold and italic** faces
   (no faux-bold); serif / sans / mono; complex scripts (Cyrillic, Vietnamese, …);
-  `white-space: pre`; **variable fonts** drawn at each `font-weight` through
+  `white-space: pre`; the raster painter draws text at the exact size with a
+  fractional pen and quarter-pixel glyph origins, so word positions agree with
+  Chrome to within half a pixel (v0.45.12); the generic monospace has Go Mono
+  bold, italic and bold italic (v0.45.12); **variable fonts** drawn at each `font-weight` through
   their `wght` axis (v0.45.10; the bundled Inter and Lora regulars too, so 300
   and 500 are their own weights); the `font` shorthand (v0.45.11). The `render`
   CLI with `-file` uses the file's directory as its base, so a relative
